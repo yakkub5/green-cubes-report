@@ -4671,21 +4671,63 @@
             // Get species data from SPIECES_BY_CATEGORY based on current scope
             const speciesByStatus = getSpeciesByStatus(scope);
 
-            const mount = (elId, arr) => { 
+            const mount = (elId, arr) => {
                 console.log(`Mounting ${arr.length} items to ${elId}`);
-                const el = document.getElementById(elId); 
+                const el = document.getElementById(elId);
                 if (!el) {
                     console.error(`Element ${elId} not found`);
                     return;
                 }
-                el.innerHTML = ''; 
-                (arr || []).forEach(name => { 
-                    const li = document.createElement('li'); 
-                    li.textContent = name; 
-                    el.appendChild(li); 
-                }); 
+                el.innerHTML = '';
+                (arr || []).forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name;
+                    el.appendChild(li);
+                });
             };
             mount('listLC', speciesByStatus.LC); mount('listNT', speciesByStatus.NT); mount('listVU', speciesByStatus.VU); mount('listEN', speciesByStatus.EN); mount('listCR', speciesByStatus.CR);
+        }
+
+        function expandCategoryInBrowser(category) {
+            console.log('Expanding category:', category);
+
+            // Get all details elements in the browser section
+            const browserPanel = document.querySelector('.browser.panel');
+            if (!browserPanel) {
+                console.error('Browser panel not found');
+                return;
+            }
+
+            const allDetails = browserPanel.querySelectorAll('details');
+
+            // Close all details first
+            allDetails.forEach(details => {
+                details.removeAttribute('open');
+            });
+
+            // Map category labels to detail IDs - need to find the right details element
+            // The details elements have summaries with IDs like sumLC, sumNT, etc.
+            const categoryToId = {
+                'LC': 'sumLC',
+                'NT': 'sumNT',
+                'VU': 'sumVU',
+                'EN': 'sumEN',
+                'CR': 'sumCR'
+            };
+
+            const targetSummaryId = categoryToId[category];
+            if (targetSummaryId) {
+                // Find the details element that contains the summary with this ID
+                const targetSummary = document.getElementById(targetSummaryId);
+                if (targetSummary) {
+                    const targetDetails = targetSummary.closest('details');
+                    if (targetDetails) {
+                        targetDetails.setAttribute('open', 'open');
+                        // Scroll to the expanded section
+                        targetDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            }
         }
 
         // ====== Charts ======
@@ -4713,7 +4755,23 @@
         const donutChart = new Chart(doughnutCtx, {
             type: 'doughnut',
             data: { labels: LABELS, datasets: [{ data: [], backgroundColor: LABELS.map(k => COLOR_MAP[k]), borderColor: 'rgba(255,255,255,.12)', borderWidth: 1, hoverOffset: 16, hoverBorderWidth: 2 }] },
-            options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${pretty(ctx.parsed)} (${ctx.rawPct ?? ''}%)` } }, centerText: { main: '', sub: '' } }, cutout: '65%', animation: { animateRotate: true, animateScale: true }, onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; } },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${pretty(ctx.parsed)} (${ctx.rawPct ?? ''}%)` } },
+                    centerText: { main: '', sub: '' }
+                },
+                cutout: '65%',
+                animation: { animateRotate: true, animateScale: true },
+                onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const clickedElement = elements[0];
+                        const clickedCategory = donutChart.data.labels[clickedElement.index];
+                        expandCategoryInBrowser(clickedCategory);
+                    }
+                }
+            },
             plugins: [centerText]
         });
 
@@ -4739,7 +4797,7 @@
         });
 
         let currentScope = 'L1';
-        let currentLang = 'en';
+        let currentLang = 'pt-BR';
         let focusThreat = false;
 
         function renderDevices() {
