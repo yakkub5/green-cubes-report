@@ -32,7 +32,7 @@
             --text: #ffffff;
             --accent: var(--primary-sky);
             --accent-2: var(--primary-sea);
-            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+            --shadow: 0 4px 24px rgba(0, 0, 0, .08);
         }
 
         * {
@@ -124,9 +124,9 @@
         .panel {
             background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
             backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 16px;
-            box-shadow: var(--shadow)
+            box-shadow: var(--shadow);
         }
 
         .row {
@@ -171,14 +171,12 @@
 
         .card h2 {
             margin: 0 0 12px;
-            font-size: 18px;
-            color: var(--primary-sky)
         }
 
         .sub {
             color: var(--muted);
             font-size: 13px;
-            margin-bottom: 8px;
+            margin-bottom: 24px;
         }
 
         .tabs {
@@ -271,7 +269,9 @@
 
         .species-list {
             padding: 0 18px 14px 42px;
-            color: #dfe3ff
+            color: #dfe3ff;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .species-list li {
@@ -317,7 +317,7 @@
 
         .insight h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 18px;
             line-height: 1.25
         }
 
@@ -403,7 +403,13 @@
 
         .meta {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px
+        }
+
+        .meta-info {
+            display: grid;
+            grid-template-rows: repeat(2, 1fr);
             gap: 12px
         }
 
@@ -414,9 +420,14 @@
             background: rgba(255, 255, 255, .05)
         }
 
+        .tlabel {
+            margin-bottom: 8px;
+        }
+
         .meta .tlabel {
             font-size: 12px;
-            color: var(--muted)
+            color: var(--muted);
+            margin-bottom: 8px;
         }
 
         .meta .tvalue {
@@ -428,7 +439,7 @@
             padding: 16px;
             display: grid;
             gap: 10px;
-            padding: 12px 12px 12px 8px;
+            padding: 12px 12px 12px 0px;
         }
 
         .devices {
@@ -582,13 +593,15 @@
                         <div class="tvalue" id="siteLabel">Carajás, Pará, Brazil</div>
                     </div>
                 </div>
-                <div class="tile">
-                    <div class="tlabel" data-i18n="meta.devices">Devices</div>
-                    <div class="tvalue" id="deviceCount">5</div>
-                </div>
-                <div class="tile">
-                    <div class="tlabel" data-i18n="meta.duration">Duration</div>
-                    <div class="tvalue" id="durationLabel">1 month</div>
+                <div class="meta-info">
+                    <div class="tile">
+                        <div class="tlabel" data-i18n="meta.devices">Devices</div>
+                        <div class="tvalue" id="deviceCount">5</div>
+                    </div>
+                    <div class="tile">
+                        <div class="tlabel" data-i18n="meta.duration">Duration</div>
+                        <div class="tvalue" id="durationLabel">1 month</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -4898,7 +4911,7 @@
 
         // Init - wrapped to ensure DOM is ready
         function initialize() {
-            renderDevices();
+            // renderDevices();
             loadScope('L1');
             applyI18N(currentLang);
         }
